@@ -1,0 +1,227 @@
+WindowManager:
+    Start:
+    CreateScreen:
+    FirstScreen:
+
+
+<Start>:
+    name : "start"
+    id : start
+
+    canvas.before:
+        Rectangle:
+            source : 'main_back.jpg'
+            size : self.size
+
+    BoxLayout:
+        orientation : "vertical"
+        RelativeLayout:
+            Label:
+                text: "YOUR CREDENTIALS STORAGE !!"
+                pos_hint: {'x': 0, 'y': 0.35}
+                font_size : dp(28)
+            Label:
+                text : "USERNAME "
+                pos_hint: {'x': -0.2, 'y': 0.1}
+                font_size : dp(20)
+            TextInput:
+                text : ''
+                id : user
+                font_size : dp(20)
+                size_hint : 0.375, 0.08
+                pos_hint: {'x': 0.45, 'y': 0.57}
+                multiline : False
+            Label:
+                text : "PASSWORD "
+                font_size : dp(20)
+                pos_hint: {'x': -0.2, 'y': -0.1}
+                font_size : dp(20)
+            TextInput:
+                text : ''
+                id : pword
+                size_hint : 0.375, 0.08
+                pos_hint: {'x': 0.45, 'y': 0.375}
+                multiline : False
+                password : True
+                on_text_validate : root.authenticate(user.text, pword.text)
+            Button:
+                text : "Authenticate"
+                size_hint : 0.2, 0.08
+                pos_hint : {'x' : 0.37, 'y' : 0.125}
+                font_size : dp(17)
+                on_release : root.authenticate(user.text, pword.text)
+
+            Button:
+                text : "Clear"
+                size_hint : 0.15, 0.08
+                pos_hint : {'x' : 0.1, 'y' : 0.125}
+                font_size : dp(17)
+                on_release : root.clear()
+
+            Button:
+                text : "Forgot Password ?"
+                size_hint : 0.25, 0.08
+                font_size : dp(17)
+                pos_hint : {'x' : 0.65, 'y' : 0.125}
+                on_release: root.forgot_pswd()
+
+
+
+<FirstScreen>:
+    name : "first"
+    id : first
+
+    canvas.before:
+        Rectangle:
+            source : 'main_back.jpg'
+            size : self.size
+
+    BoxLayout:
+        orientation : "vertical"
+        RelativeLayout:
+            Label :
+                text : "Platform : "
+                pos_hint : {"x" : -0.15,"y": 0.33 }
+                font_size : dp(20)
+            Spinner:
+                id: platform
+                size_hint: 0.325, 0.089
+                font_size : dp(20)
+                pos_hint: {'x': 0.52, 'y': 0.8}
+                text: "Select Platform"
+                values: root.platform_list
+                on_text: root.display(platform.text)
+
+            # TextInput:
+            #     text : ""
+            #     id : platform
+            #     size_hint : 0.275, 0.08
+            #     pos_hint : {"x": 0.5, "y": 0.8}
+            #     multiline : False
+            #     on_text_validate : root.display(platform.text)
+
+            Label :
+                text : "Username : "
+                pos_hint : {"x" : -0.15,"y": 0.1 }
+                font_size : dp(20)
+            TextInput:
+                text : ""
+                id : u
+                size_hint : 0.375, 0.08
+                pos_hint : {"x": 0.5, "y": 0.555}
+                font_size : dp(20)
+                multiline : False
+            Label :
+                text : "Password : "
+                pos_hint : {"x" : -0.15,"y": -0.1 }
+                font_size : dp(20)
+            TextInput:
+                text : ""
+                id : p
+                size_hint : 0.375, 0.08
+                font_size : dp(20)
+                pos_hint : {"x": 0.5, "y": 0.35}
+                multiline : False
+
+            Button:
+                text : "<---Back"
+                size_hint : 0.15, 0.1
+                pos_hint : {'x': 0.08 ,'y': 0.08}
+                font_size : dp(17)
+                on_release:
+                    app.root.current = 'start'
+                    app.root.transition.direction = 'right'
+                    root.clear()
+
+            # Button:
+            #     text : "Find !"
+            #     on_release : root.display(platform.text)
+            #     size_hint : 0.15, 0.1
+            #     pos_hint : {'x': 0.425 ,'y': 0.6}
+
+            Button:
+                text: "Clear"
+                size_hint : 0.1, 0.1
+                pos_hint : {"x": 0.75, "y": 0.08}
+                on_release: root.clear()
+                font_size : dp(17)
+
+            Button:
+                text: "Refresh"
+                font_size : dp(17)
+                size_hint : 0.12, 0.1
+                pos_hint : {"x": 0.325, "y": 0.08}
+                on_release: root.refresh()
+
+            Button:
+                text : "Create New"
+                font_size : dp(17)
+                size_hint : 0.15, 0.1
+                pos_hint : {"x" : 0.51, "y":0.08 }
+                on_release :
+                    app.root.current = 'create'
+                    app.root.transition.direction = "left"
+
+
+<CreateScreen>:
+    name : "create"
+    id : create
+
+    canvas.before:
+        Rectangle:
+            source : 'main_back.jpg'
+            size : self.size
+
+    BoxLayout:
+        orientation : "vertical"
+        RelativeLayout:
+            Label :
+                text : "Platform Name : "
+                pos_hint : {"x" : -0.25,"y": 0.33 }
+            TextInput:
+                text : ""
+                id : platform
+                size_hint : 0.275, 0.08
+                pos_hint : {"x": 0.375, "y": 0.8}
+                multiline : False
+
+            Label:
+                text : "Enter Username : "
+                pos_hint : {"x": -0.25,"y": 0.13}
+            TextInput:
+                text : ""
+                id : user
+                size_hint : 0.275, 0.08
+                pos_hint : {"x": 0.375, "y": 0.6}
+                multiline : False
+
+            Label:
+                text : "Enter Password : "
+                pos_hint : {"x": -0.25,"y": -0.07}
+            TextInput:
+                text : ""
+                id : password
+                size_hint : 0.275, 0.08
+                pos_hint : {"x": 0.375, "y": 0.4}
+                multiline : False
+
+            Button :
+                text : "Create Record !"
+                size_hint : 0.15, 0.1
+                pos_hint : {"x" : 0.425, "y":0.175 }
+                on_release:
+                    root.check(platform.text, user.text, password.text)
+
+            Button:
+                text: "Generate Random Password!!"
+                size_hint : 0.27, 0.1
+                pos_hint : {"x" : 0.7, "y":0.385}
+                on_release: root.generate_random_password()
+
+            Button :
+                text : "<---BACK"
+                size_hint : 0.15, 0.1
+                pos_hint : {"x" : 0.15, "y":0.175 }
+                on_release:
+                    app.root.current = 'first'
+                    app.root.transition.direction = 'right'
