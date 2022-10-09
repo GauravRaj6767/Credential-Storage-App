@@ -1,227 +1,245 @@
-WindowManager:
-    Start:
-    CreateScreen:
-    FirstScreen:
-
-
 <Start>:
+    canvas.before:
+        Rectangle:
+            source : 'temp.jpg'
+            size : self.size
     name : "start"
-    id : start
-
-    canvas.before:
-        Rectangle:
-            source : 'main_back.jpg'
-            size : self.size
-
     BoxLayout:
-        orientation : "vertical"
         RelativeLayout:
-            Label:
-                text: "YOUR CREDENTIALS STORAGE !!"
-                pos_hint: {'x': 0, 'y': 0.35}
-                font_size : dp(28)
-            Label:
-                text : "USERNAME "
-                pos_hint: {'x': -0.2, 'y': 0.1}
-                font_size : dp(20)
-            TextInput:
-                text : ''
-                id : user
-                font_size : dp(20)
-                size_hint : 0.375, 0.08
-                pos_hint: {'x': 0.45, 'y': 0.57}
-                multiline : False
-            Label:
-                text : "PASSWORD "
-                font_size : dp(20)
-                pos_hint: {'x': -0.2, 'y': -0.1}
-                font_size : dp(20)
-            TextInput:
-                text : ''
-                id : pword
-                size_hint : 0.375, 0.08
-                pos_hint: {'x': 0.45, 'y': 0.375}
-                multiline : False
-                password : True
-                on_text_validate : root.authenticate(user.text, pword.text)
-            Button:
-                text : "Authenticate"
-                size_hint : 0.2, 0.08
-                pos_hint : {'x' : 0.37, 'y' : 0.125}
-                font_size : dp(17)
-                on_release : root.authenticate(user.text, pword.text)
+            MDCard:
+                adaptive_size: True
+                radius: dp(50)
+                size_hint: None, None
+                size: root.width/1.75, root.height/1.5
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
-            Button:
-                text : "Clear"
-                size_hint : 0.15, 0.08
-                pos_hint : {'x' : 0.1, 'y' : 0.125}
-                font_size : dp(17)
-                on_release : root.clear()
+                RelativeLayout:
+                    Label:
+                        text: "!! WELCOME !!"
+                        font_size: 27
+                        font_style: 'fonts/Sackers-Gothic-Std-Light.ttf'
+                        halign: 'center'
+                        pos_hint: {"y": 0.4 }
 
-            Button:
-                text : "Forgot Password ?"
-                size_hint : 0.25, 0.08
-                font_size : dp(17)
-                pos_hint : {'x' : 0.65, 'y' : 0.125}
-                on_release: root.forgot_pswd()
+                    MDTextField:
+                        id: username
+                        write_tab: False
+                        mode: "rectangle"
+                        hint_text: 'Username'
+                        icon_right: 'account'
+                        line_color_normal: 0, 1, 0, 1
+                        line_color_focus: 0.8, 0.2, 0.8, 1
+                        size_hint_x: None
+                        font_size: 18
+                        width: root.width/2.5
+                        pos_hint: {"center_x": 0.5, "center_y": 0.65}
+                        on_text_validate: root.authenticate(username.text, password.text)
 
+                    MDTextField:
+                        id: password
+                        mode: 'rectangle'
+                        write_tab: False
+                        hint_text: 'Password'
+                        icon_right: 'eye-off'
+                        size_hint_x: None
+                        line_color_normal: 0, 1, 0, 1
+                        line_color_focus: 0.8, 0.2, 0.8, 1
+                        width: root.width/2.5
+                        helper_text: "or click Forgot Password Button !!"
+                        helper_text_mode: "on_focus"
+                        password: True
+                        pos_hint: {"center_x": 0.5, "center_y": 0.4}
+                        on_text_validate: root.authenticate(username.text, password.text)
 
+                    MDFillRoundFlatButton:
+                        text : "LOGIN"
+                        pos_hint : {"center_x": 0.475, "center_y" : 0.15}
+                        size_hint: None, None
+                        size: root.width/10, root.height/10
+                        on_release: root.authenticate(username.text, password.text)
 
-<FirstScreen>:
+                    MDFillRoundFlatButton:
+                        text : "CLEAR"
+                        pos_hint : {"center_x": 0.2, "center_y" : 0.15}
+                        size_hint: None, None
+                        size: root.width/10, root.height/10
+                        on_release: root.clear()
+
+                    MDFillRoundFlatButton:
+                        text : "Forgot Password"
+                        pos_hint : {"center_x": 0.775, "center_y" : 0.15}
+                        size_hint: None, None
+                        size: root.width/6, root.height/10
+                        on_release: root.loading()
+
+<First>:
     name : "first"
-    id : first
-
     canvas.before:
         Rectangle:
-            source : 'main_back.jpg'
+            source : 'back.jpg'
             size : self.size
-
-    BoxLayout:
-        orientation : "vertical"
+    MDBoxLayout:
         RelativeLayout:
-            Label :
-                text : "Platform : "
-                pos_hint : {"x" : -0.15,"y": 0.33 }
-                font_size : dp(20)
-            Spinner:
-                id: platform
-                size_hint: 0.325, 0.089
-                font_size : dp(20)
-                pos_hint: {'x': 0.52, 'y': 0.8}
-                text: "Select Platform"
-                values: root.platform_list
-                on_text: root.display(platform.text)
+            MDCard:
+                adaptive_size: True
+                radius: dp(50)
+                size_hint: None, None
+                size: root.width/1.75, root.height/1.25
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
-            # TextInput:
-            #     text : ""
-            #     id : platform
-            #     size_hint : 0.275, 0.08
-            #     pos_hint : {"x": 0.5, "y": 0.8}
-            #     multiline : False
-            #     on_text_validate : root.display(platform.text)
+                RelativeLayout:
+                    MDRoundFlatButton:
+                        id: field
+                        text: "Click to Select Platform Name !!"
+                        font_size: 18
 
-            Label :
-                text : "Username : "
-                pos_hint : {"x" : -0.15,"y": 0.1 }
-                font_size : dp(20)
-            TextInput:
-                text : ""
-                id : u
-                size_hint : 0.375, 0.08
-                pos_hint : {"x": 0.5, "y": 0.555}
-                font_size : dp(20)
-                multiline : False
-            Label :
-                text : "Password : "
-                pos_hint : {"x" : -0.15,"y": -0.1 }
-                font_size : dp(20)
-            TextInput:
-                text : ""
-                id : p
-                size_hint : 0.375, 0.08
-                font_size : dp(20)
-                pos_hint : {"x": 0.5, "y": 0.35}
-                multiline : False
+                        pos_hint: {'center_x': .5, 'center_y': 0.875}
+                        size_hint: 0.25, 0.1
+                        on_release: root.menu.open()
+                    MDIconButton:
+                        icon: 'refresh'
+                        pos_hint: {"center_x": 0.9, "center_y": 0.875}
+                        on_release: root.refresh()
 
-            Button:
-                text : "<---Back"
-                size_hint : 0.15, 0.1
-                pos_hint : {'x': 0.08 ,'y': 0.08}
-                font_size : dp(17)
-                on_release:
-                    app.root.current = 'start'
-                    app.root.transition.direction = 'right'
-                    root.clear()
+                    MDTextField:
+                        id: username
+                        hint_text: "Username : "
+                        write_tab: False
+                        readonly: True
+                        icon_left: 'email'
+                        mode: 'rectangle'
+                        size_hint: 0.8, 0.15
+                        line_color_normal: 0.5, 0.1, 1, 1
+                        line_color_focus: 0.5, 0.1, 1, 1
+                        pos_hint: {"center_x": 0.5, "y": 0.625}
+                        font_style: "H5"
+                        font_size: 22
+                    MDTextField:
+                        id: password
+                        #readonly: True
+                        hint_text: "Password : "
+                        write_tab: False
+                        font_size: 22
+                        line_color_normal: 0.5, 0.1, 1, 1
+                        line_color_focus: 0.5, 0.1, 1, 1
+                        icon_left: 'key-variant'
+                        mode: 'rectangle'
+                        size_hint: 0.8, 0.15
+                        pos_hint: {"center_x": 0.5, "y": 0.425}
+                        font_style: "H5"
 
-            # Button:
-            #     text : "Find !"
-            #     on_release : root.display(platform.text)
-            #     size_hint : 0.15, 0.1
-            #     pos_hint : {'x': 0.425 ,'y': 0.6}
-
-            Button:
-                text: "Clear"
-                size_hint : 0.1, 0.1
-                pos_hint : {"x": 0.75, "y": 0.08}
-                on_release: root.clear()
-                font_size : dp(17)
-
-            Button:
-                text: "Refresh"
-                font_size : dp(17)
-                size_hint : 0.12, 0.1
-                pos_hint : {"x": 0.325, "y": 0.08}
-                on_release: root.refresh()
-
-            Button:
-                text : "Create New"
-                font_size : dp(17)
-                size_hint : 0.15, 0.1
-                pos_hint : {"x" : 0.51, "y":0.08 }
-                on_release :
-                    app.root.current = 'create'
-                    app.root.transition.direction = "left"
+                    MDFillRoundFlatButton:
+                        text: "Create New Record"
+                        font_size: 18
+                        pos_hint: {"center_x": 0.5, "center_y": 0.325}
+                        on_release:
+                            app.root.current = 'create'
+                            app.root.transition.direction = 'left'
+                    MDFillRoundFlatButton:
+                        text: "Clear"
+                        font_size: 18
+                        pos_hint: {"center_x": 0.5, "center_y": 0.2}
+                        on_release: root.clear()
+                    MDFillRoundFlatButton:
+                        text: "<---Back"
+                        font_size: 18
+                        pos_hint: {"center_x": 0.5, "center_y": 0.075}
+                        on_release:
+                            app.root.current = 'start'
+                            app.root.transition.direction = 'right'
 
 
 <CreateScreen>:
-    name : "create"
-    id : create
-
+    name: "create"
     canvas.before:
         Rectangle:
-            source : 'main_back.jpg'
+            source : 'back.jpg'
             size : self.size
-
     BoxLayout:
-        orientation : "vertical"
         RelativeLayout:
-            Label :
-                text : "Platform Name : "
-                pos_hint : {"x" : -0.25,"y": 0.33 }
-            TextInput:
-                text : ""
-                id : platform
-                size_hint : 0.275, 0.08
-                pos_hint : {"x": 0.375, "y": 0.8}
-                multiline : False
+            MDCard:
+                adaptive_size: True
+                radius: dp(50)
+                size_hint: None, None
+                size: root.width/1.75, root.height/1.25
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
-            Label:
-                text : "Enter Username : "
-                pos_hint : {"x": -0.25,"y": 0.13}
-            TextInput:
-                text : ""
-                id : user
-                size_hint : 0.275, 0.08
-                pos_hint : {"x": 0.375, "y": 0.6}
-                multiline : False
+                RelativeLayout:
+                    MDTextField:
+                        id: platform
+                        font_size: 20
+                        hint_text: "Type Platform "
+                        mode: 'rectangle'
+                        size_hint: 0.8, 0.15
+                        write_tab: False
+                        line_color_normal: 0.5, 0.1, 1, 1
+                        line_color_focus: 0.5, 0.1, 1, 1
+                        pos_hint: {"center_x": 0.5, "y": 0.75}
 
-            Label:
-                text : "Enter Password : "
-                pos_hint : {"x": -0.25,"y": -0.07}
-            TextInput:
-                text : ""
-                id : password
-                size_hint : 0.275, 0.08
-                pos_hint : {"x": 0.375, "y": 0.4}
-                multiline : False
+                    MDTextField:
+                        id: username
+                        icon_left: 'email'
+                        hint_text: "Username : "
+                        mode: 'rectangle'
+                        size_hint: 0.8, 0.15
+                        font_size: 20
+                        write_tab: False
+                        line_color_normal: 0.5, 0.1, 1, 1
+                        line_color_focus: 0.5, 0.1, 1, 1
+                        pos_hint: {"center_x": 0.5, "y": 0.56}
 
-            Button :
-                text : "Create Record !"
-                size_hint : 0.15, 0.1
-                pos_hint : {"x" : 0.425, "y":0.175 }
-                on_release:
-                    root.check(platform.text, user.text, password.text)
+                    MDTextField:
+                        id: password
+                        write_tab: False
+                        icon_left: 'key-variant'
+                        hint_text: "Password : "
+                        mode: 'rectangle'
+                        size_hint: 0.8, 0.15
+                        font_size: 20
+                        line_color_normal: 0.5, 0.1, 1, 1
+                        line_color_focus: 0.5, 0.1, 1, 1
+                        pos_hint: {"center_x": 0.5, "y": 0.25}
 
-            Button:
-                text: "Generate Random Password!!"
-                size_hint : 0.27, 0.1
-                pos_hint : {"x" : 0.7, "y":0.385}
-                on_release: root.generate_random_password()
+                    MDFillRoundFlatButton:
+                        text: "Create Record"
+                        font_size: 18
+                        pos_hint: {"center_x": 0.5, "center_y": 0.175}
+                        on_release: root.create_record(platform.text, username.text, password.text)
 
-            Button :
-                text : "<---BACK"
-                size_hint : 0.15, 0.1
-                pos_hint : {"x" : 0.15, "y":0.175 }
-                on_release:
-                    app.root.current = 'first'
-                    app.root.transition.direction = 'right'
+                    MDFillRoundFlatButton:
+                        text: "<---Back"
+                        font_size: 18
+                        pos_hint: {"center_x": 0.2, "center_y": 0.075}
+                        on_release:
+                            app.root.current = 'first'
+                            app.root.transition.direction = 'right'
+                    MDFillRoundFlatButton:
+                        text: "Clear"
+                        font_size: 18
+                        pos_hint: {"center_x": 0.8, "center_y": 0.075}
+                        on_release: root.clear()
+
+                    MDRoundFlatButton:
+                        id: random_password
+                        text: "Random Password !!"
+                        font_size: 15
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.475}
+                        size_hint: 0.175, 0.1
+                        on_release: root.generate_random_password()
+
+
+
+<RunningPopup>:
+    title: "LOADING !!"
+    size_hint: 0.35, 0.45
+    BoxLayout:
+        Image:
+            size: root.width, root.height/1.325
+            source: 'loading.gif'
+            allow_stretch: True
+            keep_ratio: False
+            size_hint_y: None
+            anim_delay: 0.05
+            mipmap: True
+
+
