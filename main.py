@@ -1,31 +1,41 @@
-import string
-import mysql.connector
-import random
-import ssl
 import smtplib
-from kivy.app import App
+import threading
+from email.message import EmailMessage
+import ssl
+import string
+import random
+
+import mysql.connector
+from kivy.properties import ObjectProperty
+
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-from email.message import EmailMessage
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import Screen
+from kivymd.app import MDApp
+from kivy.lang import Builder
+from kivymd.material_resources import dp
+from kivymd.uix.button import MDFillRoundFlatButton, MDRoundFlatButton
+from kivymd.uix.menu import MDDropdownMenu
+from kivy.factory import Factory
 
 
-class DetailsApp(App):
-    pass
+class RunningPopup(Popup):
+    fpop = None
 
+    def set_pop(self, pwin):
+        self.fpop = pwin
 
-class WindowManager(ScreenManager):
-    pass
+    def close(self):
+        self.fpop.dismiss()
 
 
 class Start(Screen):
-    username = 'abc'
-    password = '123'
+    pop_up = ObjectProperty()
 
-    def __init__(self, **kwargs):
-        super(Start, self).__init__(**kwargs)
+    def clear(self):
+        self.ids.username.text = ''
+        self.ids.password.text = ''
 
     def authenticate(self, uid, password):
         db_obj = mysql.connector.connect(host="localhost", user="root", password="", database='project')
@@ -42,7 +52,7 @@ class Start(Screen):
         if check != 1:
             layout = BoxLayout(orientation="vertical")
             label = Label(text='Invalid Credentials', font_size=25)
-            button = Button(text='OK', font_size=30, size_hint=(None, None), size=(75, 50), pos_hint={"x": 0.375})
+            button = MDFillRoundFlatButton(text='OK', font_size=20, size_hint=(None, None), size=(50, 25), pos_hint={"x": 0.375})
             layout.add_widget(label)
             layout.add_widget(button)
             popup = Popup(title="LOGIN FAILED !!!", content=layout, size_hint=(None, None), size=(300, 250))
@@ -51,10 +61,26 @@ class Start(Screen):
 
         else:
             print("Welcome")
-            self.ids.user.text = ''
-            self.ids.pword.text = ''
+            self.ids.username.text = ''
+            self.ids.password.text = ''
             self.manager.current = 'first'
-            self.manager.transition.direction = 'up'
+            self.manager.transition.direction = 'left'
+
+    def loading(self):
+        layout = BoxLayout(orientation="vertical")
+        label = Label(text="Email consisting of your username and password will be sent to your id !!", font_size=18)
+        button = MDRoundFlatButton(text='OK', font_size=20, size_hint=(None, None), size=(50, 25), pos_hint={"x": 0.45})
+        layout.add_widget(label)
+        layout.add_widget(button)
+        popup = Popup(title="Email Sent", content=layout, size_hint=(None, None), size=(650, 250))
+        button.bind(on_release=popup.dismiss)
+        popup.open()
+
+        self.pop_up = RunningPopup()
+        self.pop_up.open()
+
+        mythread = threading.Thread(target=self.forgot_pswd)
+        mythread.start()
 
     def forgot_pswd(self):
         print("HELLO")
@@ -67,7 +93,7 @@ class Start(Screen):
         Username : {}
         Password : {}
         Do not share with anyone !
-        """.format(self.username, self.password)
+        """.format('abc', '123456')
 
         em = EmailMessage()
         em['From'] = sender
@@ -81,48 +107,35 @@ class Start(Screen):
             smtp.login(sender, pswd)
             smtp.sendmail(sender, receiver, em.as_string())
 
-        layout = BoxLayout(orientation="vertical")
-        label = Label(text="Email consisting of your username and password has been sent to your id !!", font_size=18)
-        button = Button(text='OK', font_size=30, size_hint=(None, None), size=(75, 50), pos_hint={"x": 0.45})
-        layout.add_widget(label)
-        layout.add_widget(button)
-        popup = Popup(title="Email Sent", content=layout, size_hint=(None, None), size=(650, 250))
-        popup.open()
-        button.bind(on_release=popup.dismiss)
-
-    def clear(self):
-        self.ids.user.text = ''
-        self.ids.pword.text = ''
+        print("Done")
+        self.pop_up.dismiss()
 
 
-class FirstScreen(Screen):
+class First(Screen):
     platform_list = []
 
     def __init__(self, **kwargs):
-        super(FirstScreen, self).__init__(**kwargs)
+        super(First, self).__init__(**kwargs)
         db_obj = mysql.connector.connect(host="localhost", user="root", password="", database='project')
         cursor = db_obj.cursor()
         cursor.execute('select platform from details')
         for i in cursor:
-            self.platform_list.append(i[0])
+            self.platform_list.append(
+                {
+                    "text": f"{i[0]}",
+                    "viewclass": "OneLineListItem",
+                    "icon": "git",
+                    "height": dp(56),
+                    "on_release": lambda x=f"{i[0]}": self.set_item(x),
+                }
+            )
 
-    def display(self, platform):
-        db_obj = mysql.connector.connect(host="localhost", user="root", password="", database='project')
-        cursor = db_obj.cursor()
-        cursor.execute('select * from details')
-        check = 0
-        platform = platform.lower()
-        u = ''
-        p = ''
-        for x in cursor:
-            if platform == x[1].lower():
-                u = x[2]
-                p = x[3]
-                break
-
-        print("Success")
-        self.ids.u.text = u
-        self.ids.p.text = p
+        self.menu = MDDropdownMenu(
+            caller=self.ids.field,
+            items=self.platform_list,
+            position="bottom",
+            width_mult=4,
+        )
 
     def refresh(self):
         self.platform_list = []
@@ -130,62 +143,103 @@ class FirstScreen(Screen):
         cursor = db_obj.cursor()
         cursor.execute('select platform from details')
         for i in cursor:
-            self.platform_list.append(i[0])
+            self.platform_list.append(
+                {
+                    "text": f"{i[0]}",
+                    "viewclass": "OneLineListItem",
+                    "icon": "git",
+                    "height": dp(56),
+                    "on_release": lambda x=f"{i[0]}": self.set_item(x),
+                }
+            )
+
+        self.menu = MDDropdownMenu(
+            caller=self.ids.field,
+            items=self.platform_list,
+            position="bottom",
+            width_mult=4,
+        )
+
+    def set_item(self, text__item):
+        self.ids.field.text = text__item
+        db_obj = mysql.connector.connect(host="localhost", user="root", password="", database='project')
+        cursor = db_obj.cursor()
+        cursor.execute(f'select username, password from details where platform = "{text__item}"')
+        for i in cursor:
+            self.ids.username.text = i[0]
+            self.ids.password.text = i[1]
+        self.menu.dismiss()
 
     def clear(self):
-        self.ids.u.text = ''
-        self.ids.p.text = ''
-        self.ids.platform.text = "Select Platform"
+        self.ids.username.text = ''
+        self.ids.password.text = ''
+        self.ids.field.text = 'Click to Select Platform Name !!'
 
 
 class CreateScreen(Screen):
-
-    def __init__(self, **kwargs):
-        super(CreateScreen, self).__init__(**kwargs)
-
-    def create(self, platform, username, password):
-        print("Create Page")
-        db_obj = mysql.connector.connect(host="localhost", user="root", password="", database='project')
-        cursor = db_obj.cursor()
-        cursor.execute('select max(s_no) from details')
-        n = 0
-        for i in cursor:
-            n = int(i[0])
-        n += 1
-        cursor.execute('insert into details values({},"{}", "{}", "{}")'.format(n, platform, username, password))
-        db_obj.commit()
-        self.confirmation(platform)
-
-    def check(self, platform, username, password):
-        if platform == '' or username == '' or password == '':
-            layout = BoxLayout(orientation="vertical")
-            label = Label(text="Empty Fields not Accepted !!", font_size=25)
-            button = Button(text='OK', font_size=30, size_hint=(None, None), size=(75, 50), pos_hint={"x": 0.375})
-            layout.add_widget(label)
-            layout.add_widget(button)
-            popup = Popup(title="Failed To Enter Data !!", content=layout, size_hint=(None, None), size=(400, 250))
-            popup.open()
-            button.bind(on_release=popup.dismiss)
-        else:
-            self.manager.current = 'first'
-            self.manager.transition.direction = 'right'
-            self.create(platform, username, password)
-
-    def confirmation(self, platform):
-        layout = BoxLayout(orientation="vertical")
-        label = Label(text='Credentials of {} Stored'.format(platform), font_size=25)
-        button = Button(text='OK', font_size=30, size_hint=(None, None), size=(75, 50), pos_hint={"x": 0.375})
-        layout.add_widget(label)
-        layout.add_widget(button)
-        popup = Popup(title="Success", content=layout, size_hint=(None, None), size=(500, 250))
-        popup.open()
-        button.bind(on_release=popup.dismiss)
 
     def generate_random_password(self):
         length = 15
         ran = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=length))
         self.ids.password.text = ran
 
+    def clear(self):
+        self.ids.username.text = ''
+        self.ids.password.text = ''
+        self.ids.platform.text = ''
 
-DetailsApp().run()
+    def create_record(self, platform, username, password):
+        if platform == '' or username == '' or password == '':
+            print("Empty Fields Not Accepted !!")
+            layout = BoxLayout(orientation="vertical")
+            label = Label(text='Empty Fields Not Accepted !!', font_size=25)
+            button = MDFillRoundFlatButton(text='OK', font_size=20, size_hint=(None, None), size=(75, 50), pos_hint={"x": 0.4})
+            layout.add_widget(label)
+            layout.add_widget(button)
+            popup = Popup(title="Empty", content=layout, size_hint=(None, None), size=(400, 250))
+            popup.open()
+            button.bind(on_release=popup.dismiss)
+
+        else:
+            print("Create Page")
+            platform = platform.upper()
+
+            db_obj = mysql.connector.connect(host="localhost", user="root", password="", database='project')
+            cursor = db_obj.cursor()
+            cursor.execute('select max(s_no) from details')
+            n = 0
+            for i in cursor:
+                n = int(i[0])
+            n += 1
+            cursor.execute('insert into details values({},"{}", "{}", "{}")'.format(n, platform, username, password))
+            db_obj.commit()
+            self.confirmation(platform)
+
+    def confirmation(self, platform):
+
+        layout = BoxLayout(orientation="vertical")
+        label = Label(text='Credentials of {} Stored'.format(platform), font_size=25)
+        button = MDFillRoundFlatButton(text='OK', font_size=20, size_hint=(None, None), size=(75, 50), pos_hint={"x": 0.4})
+        layout.add_widget(label)
+        layout.add_widget(button)
+        popup = Popup(title="Success", content=layout, size_hint=(None, None), size=(400, 250))
+        popup.open()
+        button.bind(on_release=popup.dismiss)
+
+
+class MainApp(MDApp):
+    def build(self):
+        Builder.load_file("testing.kv")
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "Blue"
+        self.theme_cls.accent_palette = "Red"
+        sm = Factory.ScreenManager()
+        sm.add_widget(Start())
+        sm.add_widget(CreateScreen())
+        sm.add_widget(First())
+
+        return sm
+
+
+MainApp().run()
 
